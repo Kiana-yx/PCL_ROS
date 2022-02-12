@@ -49,10 +49,12 @@ void PclTestCore::clip_above(double clip_height, const pcl::PointCloud<pcl::Poin
         pass.setFilterLimits(-2, clip_height); //滤波范围
         pass.filter(*out);                     //滤波结果存放
 
+        #ifdef IN_door
         pass.setInputCloud(out);      //设置输入点云
         pass.setFilterFieldName("x"); //设置滤波的field
         pass.setFilterLimits(-1, 8);  //滤波范围
         pass.filter(*out);            //滤波结果存放
+        #endif
     }
 }
 
@@ -381,7 +383,7 @@ void PclTestCore::point_cb(const sensor_msgs::PointCloud2ConstPtr &in_cloud_ptr)
 
     pcl::fromROSMsg(*in_cloud_ptr, *current_pc_ptr);
 
-    clip_above(CLIP_HEIGHT, current_pc_ptr, cliped_pc_ptr, true);
+    clip_above(CLIP_HEIGHT, current_pc_ptr, cliped_pc_ptr, false);
     remove_close_pt(MIN_DISTANCE, cliped_pc_ptr, remove_close_ptr);
     remove_outlier(remove_close_ptr, base_filtered_ptr);
     
