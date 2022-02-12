@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db",
+                "limitSymbolsToIncludedHeaders": false
+            },
+            "includePath": [
+                "/opt/ros/noetic/include/**",
+                "/home/kiana/catkin_ws/src/A-LOAM/include/**",
+                "/home/kiana/catkin_ws/src/husky_highlevel_controller/include/**",
+                "/home/kiana/catkin_ws/src/lidar_pkg/include/**",
+                "/usr/include/**",
+                "${workspaceFolder}/src/pcl_test/include"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "c++14"
+        }
+    ],
+    "version": 4
+}

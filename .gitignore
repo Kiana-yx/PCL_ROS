@@ -1,0 +1,11 @@
+# 忽略指定文件夹
+.history/
+.vscode/*
+!.vscode/settings.json
+!.vscode/c_cpp_properties.json
+
+devel/
+build/
+src/*
+!src/pcl_test/
+
