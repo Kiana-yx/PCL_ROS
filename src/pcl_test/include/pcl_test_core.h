@@ -21,7 +21,7 @@
 
 #include <sensor_msgs/PointCloud2.h>
 
-#define IN_door
+#define OUT_door
 
 #ifdef OUT_door
     #define CLIP_HEIGHT 8 //截取掉高于雷达自身8米的点
@@ -44,8 +44,6 @@
 #define reclass_distance_threshold_ 0.2
 
 #define PI 3.1415926
-
-typedef pcl::PointXYZ PointT;
 
 class PclTestCore
 {
