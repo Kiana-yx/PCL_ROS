@@ -2,8 +2,8 @@
 
 TimBaseCore::TimBaseCore(ros::NodeHandle &nh)
 {
-    sub_point_scan_ = nh.subscribe("/scan", 10, &TimBaseCore::point_main, this);
-    sub_point_cloud_ = nh.subscribe("/cloud", 10, &TimBaseCore::point_main, this);
+    sub_point_scan_ = nh.subscribe("/scan", 10, &TimBaseCore::LaserCallBack, this);
+    sub_point_cloud_ = nh.subscribe("/cloud", 10, &TimBaseCore::LaserCallBack, this);
 
     pub_cylinder_ = nh.advertise<sensor_msgs::PointCloud2>("/cylinder", 10);
     
@@ -20,7 +20,16 @@ void TimBaseCore::Spin()
 
 
 
-void TimBaseCore::point_main(const sensor_msgs::PointCloud2ConstPtr &in_cloud_ptr)
+void TimBaseCore::LaserCallBack(const sensor_msgs::LaserScan::ConstPtr &msg)
 {
-   
+   unsigned long len = msg->ranges.size();
+        std::vector<float> filtered_scan;
+        for (int i = 0; i < len; ++i) {
+            if(std::isnormal(msg->ranges[i])){
+                filtered_scan.push_back(msg->ranges[i]);
+            }
+        }
+        for (int j = 0; j < filtered_scan.size(); ++j) {
+            ROS_INFO_STREAM(filtered_scan[j]);
+        }
 }

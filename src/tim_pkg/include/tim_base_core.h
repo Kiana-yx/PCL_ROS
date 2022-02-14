@@ -16,7 +16,7 @@ private:
 
     ros::Publisher pub_cylinder_; //发布话题
 
-    void point_main(const sensor_msgs::PointCloud2ConstPtr &in_cloud);
+    void LaserCallBack(const sensor_msgs::LaserScan::ConstPtr &msg);
 
 public:
     TimBaseCore(ros::NodeHandle &nh);

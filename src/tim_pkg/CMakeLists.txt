@@ -23,10 +23,10 @@ include_directories(
 )
 link_directories(${PCL_LIBRARY_DIRS})
 
-add_executable(${PROJECT_NAME}_node src/tim_base_node.cpp src/tim_base_core.cpp)
+add_executable(tim_base_node src/tim_base_node.cpp src/tim_base_core.cpp)
 
 
-target_link_libraries(${PROJECT_NAME}_node
+target_link_libraries(tim_base_node
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
 )
