@@ -23,7 +23,7 @@ void PclTestCore::clip_above(double clip_height, const pcl::PointCloud<pcl::Poin
                              const pcl::PointCloud<pcl::PointXYZI>::Ptr out,
                              bool PassThrough)
 {
-    if (PassThrough = false)
+    if (PassThrough == false)
     {
         pcl::ExtractIndices<pcl::PointXYZI> cliper;
 
@@ -381,6 +381,8 @@ void PclTestCore::publish_cloud(const ros::Publisher &in_publisher,
 
 void PclTestCore::point_cb(const sensor_msgs::PointCloud2ConstPtr &in_cloud_ptr)
 {
+    std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
+    
     pcl::PointCloud<pcl::PointXYZI>::Ptr current_pc_ptr(new pcl::PointCloud<pcl::PointXYZI>);
     pcl::PointCloud<pcl::PointXYZI>::Ptr cliped_pc_ptr(new pcl::PointCloud<pcl::PointXYZI>);
     pcl::PointCloud<pcl::PointXYZI>::Ptr remove_close_ptr(new pcl::PointCloud<pcl::PointXYZI>);
@@ -401,4 +403,11 @@ void PclTestCore::point_cb(const sensor_msgs::PointCloud2ConstPtr &in_cloud_ptr)
     publish_cloud(pub_no_ground_, no_ground_cloud_ptr, in_cloud_ptr->header);
     publish_cloud(pub_ground_, ground_cloud_ptr, in_cloud_ptr->header);
     publish_cloud(pub_filtered_, base_filtered_ptr, in_cloud_ptr->header);
+
+    std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
+    std::chrono::duration<double> time_used = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time);
+   // std::cout<<"处理一次数据用时: "<< time_used.count() << " 秒。" << std::endl;
+    setlocale(LC_CTYPE, "zh_CN.utf8");  
+    ROS_INFO("处理一次数据用时: %f 秒", time_used.count());
+
 }
