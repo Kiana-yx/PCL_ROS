@@ -57,6 +57,13 @@ void PclTestCore::clip_above(double clip_height, const pcl::PointCloud<pcl::Poin
         #endif
     }
 }
+void PclTestCore::voxel_grid_filer(pcl::PointCloud<pcl::PointXYZ>::Ptr in, pcl::PointCloud<pcl::PointXYZ>::Ptr out, double leaf_size)
+{
+    pcl::VoxelGrid<pcl::PointXYZ> filter;
+    filter.setInputCloud(in);
+    filter.setLeafSize(leaf_size, leaf_size, leaf_size);
+    filter.filter(*out);
+}
 
 void PclTestCore::remove_close_pt(double min_distance, const pcl::PointCloud<pcl::PointXYZI>::Ptr in,
                                   const pcl::PointCloud<pcl::PointXYZI>::Ptr out)

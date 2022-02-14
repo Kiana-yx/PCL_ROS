@@ -11,7 +11,9 @@
                 "/home/kiana/catkin_ws/src/husky_highlevel_controller/include/**",
                 "/home/kiana/catkin_ws/src/lidar_pkg/include/**",
                 "/usr/include/**",
-                "${workspaceFolder}/src/pcl_test/include"
+                "${workspaceFolder}/src/pcl_test/include",
+                "${workspaceFolder}/src/euclidean_cluster/include",
+                "${workspaceFolder}/src/tim_pkg/include"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",
