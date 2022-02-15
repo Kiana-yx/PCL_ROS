@@ -22,7 +22,7 @@
 
 #include <sensor_msgs/PointCloud2.h>
 
-#define OUT_door
+#define IN_door
 
 #ifdef OUT_door
 #define CLIP_HEIGHT 8 //截取掉高于雷达自身8米的点

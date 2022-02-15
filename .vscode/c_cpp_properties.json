@@ -13,7 +13,8 @@
                 "/usr/include/**",
                 "${workspaceFolder}/src/pcl_test/include",
                 "${workspaceFolder}/src/euclidean_cluster/include",
-                "${workspaceFolder}/src/tim_pkg/include"
+                "${workspaceFolder}/src/tim_pkg/include",
+                "${workspaceFolder}/src/rviz_telop_commander/include"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",

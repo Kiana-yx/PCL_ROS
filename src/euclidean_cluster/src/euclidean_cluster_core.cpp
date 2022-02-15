@@ -49,12 +49,12 @@ void EuClusterCore::cluster_segment(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc,
     if (cloud_2d->points.size() > 0)
         tree->setInputCloud(cloud_2d);
 
-    std::vector<pcl::PointIndices> local_indices;
-
+    //欧式距离分类
     pcl::EuclideanClusterExtraction<pcl::PointXYZ> euclid;
+    std::vector<pcl::PointIndices> local_indices;
     euclid.setInputCloud(cloud_2d);
-    euclid.setClusterTolerance(in_max_cluster_distance);
-    euclid.setMinClusterSize(MIN_CLUSTER_SIZE);
+    euclid.setClusterTolerance(in_max_cluster_distance);//设置近邻搜索的搜索半径
+    euclid.setMinClusterSize(MIN_CLUSTER_SIZE);//设置最小聚类尺寸
     euclid.setMaxClusterSize(MAX_CLUSTER_SIZE);
     euclid.setSearchMethod(tree);
     euclid.extract(local_indices);
@@ -189,6 +189,9 @@ void EuClusterCore::cluster_by_distance(pcl::PointCloud<pcl::PointXYZ>::Ptr in_p
         }
     }
 
+    std::vector<pcl::PointIndices> final_indices;
+    std::vector<pcl::PointIndices> tmp_indices;
+
     for (size_t i = 0; i < segment_pc_array.size(); i++)
     {
         cluster_segment(segment_pc_array[i], cluster_distance_[i], obj_list);
@@ -200,6 +203,8 @@ void EuClusterCore::point_cb(const sensor_msgs::PointCloud2ConstPtr &in_cloud_pt
     pcl::PointCloud<pcl::PointXYZ>::Ptr current_pc_ptr(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_pc_ptr(new pcl::PointCloud<pcl::PointXYZ>);
 
+   point_cloud_header_ = in_cloud_ptr->header;
+
     pcl::fromROSMsg(*in_cloud_ptr, *current_pc_ptr);
     // down sampling the point cloud before cluster
     voxel_grid_filer(current_pc_ptr, filtered_pc_ptr, LEAF_SIZE);
@@ -208,12 +213,12 @@ void EuClusterCore::point_cb(const sensor_msgs::PointCloud2ConstPtr &in_cloud_pt
     cluster_by_distance(filtered_pc_ptr, global_obj_list);
 
     jsk_recognition_msgs::BoundingBoxArray bbox_array;
-    bbox_array.header = in_cloud_ptr->header;
 
     for (size_t i = 0; i < global_obj_list.size(); i++)
     {
         bbox_array.boxes.push_back(global_obj_list[i].bounding_box_);
     }
-    
+   bbox_array.header = point_cloud_header_;
+   
     pub_bounding_boxs_.publish(bbox_array);
 }
