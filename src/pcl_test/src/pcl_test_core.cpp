@@ -406,8 +406,7 @@ void PclTestCore::point_cb(const sensor_msgs::PointCloud2ConstPtr &in_cloud_ptr)
 
     std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
     std::chrono::duration<double> time_used = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time);
-   // std::cout<<"处理一次数据用时: "<< time_used.count() << " 秒。" << std::endl;
     setlocale(LC_CTYPE, "zh_CN.utf8");  
-    ROS_INFO("处理一次数据用时: %f 秒", time_used.count());
+    // ROS_INFO("处理一次数据用时: %f 秒", time_used.count());
 
 }

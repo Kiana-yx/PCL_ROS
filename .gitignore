@@ -8,5 +8,5 @@ devel/
 build/
 src/*
 !src/pcl_test/
-!src/euclidean_cluster/
+!src/euclidean_cluster
 !src/tim_pkg/
