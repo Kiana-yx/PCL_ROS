@@ -11,3 +11,4 @@ src/*
 !src/euclidean_cluster/
 !src/tim_pkg/
 !src/rviz_telop_commander/
+!src/learning_python
