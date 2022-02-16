@@ -8,6 +8,9 @@ devel/
 build/
 src/*
 !src/pcl_test/
-!src/euclidean_cluster
+!src/euclidean_cluster/
 !src/tim_pkg/
 !src/rviz_telop_commander/
+!src/ros_qt_demo/
+!src/Ros_Qt5_Gui_App/
+
