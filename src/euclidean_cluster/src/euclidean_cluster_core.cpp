@@ -3,7 +3,7 @@
 EuClusterCore::EuClusterCore(ros::NodeHandle &nh)
 {
     seg_distance_ = {15, 30, 45, 60};   //划分区域
-    cluster_distance_ = {0.5, 1.0, 1.5, 2.0, 2.5};  //不同距离区域使用不同的聚类半径阈值
+    cluster_distance_ = {0.2, 1.0, 1.5, 2.0, 2.5};  //不同距离区域使用不同的聚类半径阈值
     
     sub_point_cloud_ = nh.subscribe("/filtered_points_no_ground", 5, &EuClusterCore::point_cb, this);
     pub_bounding_boxs_ = nh.advertise<jsk_recognition_msgs::BoundingBoxArray>("/detected_bounding_boxs", 5);
@@ -46,18 +46,21 @@ void EuClusterCore::cluster_segment(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc,
         cloud_2d->points[i].z = 0;
     }
 
-    if (cloud_2d->points.size() > 0)
-        tree->setInputCloud(cloud_2d);
+    // if (cloud_2d->points.size() > 0)
+    //     tree->setInputCloud(cloud_2d);
 
     //欧式距离分类
     pcl::EuclideanClusterExtraction<pcl::PointXYZ> euclid;
     std::vector<pcl::PointIndices> local_indices;
-    euclid.setInputCloud(cloud_2d);
+    euclid.setInputCloud(in_pc);
     euclid.setClusterTolerance(in_max_cluster_distance);//设置近邻搜索的搜索半径
     euclid.setMinClusterSize(MIN_CLUSTER_SIZE);//设置最小聚类尺寸
     euclid.setMaxClusterSize(MAX_CLUSTER_SIZE);
     euclid.setSearchMethod(tree);
     euclid.extract(local_indices);
+
+    setlocale(LC_CTYPE, "zh_CN.utf8");  
+    ROS_INFO("聚类为: %ld 块", local_indices.size());
 
     for (size_t i = 0; i < local_indices.size(); i++)
     {

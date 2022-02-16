@@ -28,8 +28,8 @@
 #include <sensor_msgs/PointCloud2.h>
 
 #define LEAF_SIZE 0.1 //定义降采样的leaf size，聚类是一个费时运算，为了减少计算量，我们通常先进行降采样
-#define MIN_CLUSTER_SIZE 20
-#define MAX_CLUSTER_SIZE 5000
+#define MIN_CLUSTER_SIZE 100
+#define MAX_CLUSTER_SIZE 500
 
 class EuClusterCore
 {
