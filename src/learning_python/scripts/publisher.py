@@ -1,33 +1,42 @@
-#!/usr/bin/env python3 
-#coding:utf‐8 #设置编码格式为utf‐8 
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-import rospy #导入rospy功能包
-from std_msgs.msg import String #导入std_msgs/String消息功能包 
+########################################################################
+####          Copyright 2020 GuYueHome (www.guyuehome.com).          ###
+########################################################################
 
-#定义talker函数 
-def talker(): 
+# 该例程将发布turtle1/cmd_vel话题，消息类型geometry_msgs::Twist
 
-    pub = rospy.Proscoreublisher('chatter', String, queue_size=10) 
-    #定义发布的主题名称chatter，消息类型String,实质是std_msgs.msg.String 
-    #设置队列条目个数为10 
+import rospy
+from geometry_msgs.msg import Twist
 
+def velocity_publisher():
+	# ROS节点初始化
+    rospy.init_node('velocity_publisher', anonymous=True)
 
-    rospy.init_node('talker', anonymous=True) 
-    #初始化节点，节点名称为talker, 
-    #anonymous=True，要求每个节点都有唯一的名称，避免冲突
+	# 创建一个Publisher，发布名为/turtle1/cmd_vel的topic，消息类型为geometry_msgs::Twist，队列长度10
+    turtle_vel_pub = rospy.Publisher('/turtle1/cmd_vel', Twist, queue_size=10)
 
+	#设置循环的频率
     rate = rospy.Rate(10) 
-    #设置发布的频率，单位是每秒次数，这是每秒10次的频率发布主题 
 
-    # #用于检测程序是否退出，是否按Ctrl‐C 或其他
-    while not rospy.is_shutdown(): 
-        hello_str = "hello world"
-        rospy.INFO(hello_str) #在屏幕输出日志信息
-        pub.publish(hello_str) #发布信息到主题 
-    rate.sleep() #睡眠一定持续时间 
+    while not rospy.is_shutdown():
+		# 初始化geometry_msgs::Twist类型的消息
+        vel_msg = Twist()
+        vel_msg.linear.x = 0.5
+        vel_msg.angular.z = 0.2
 
-if __name__ == '__main__': 
-    try: 
-        talker() 
-    except:
+		# 发布消息
+        turtle_vel_pub.publish(vel_msg)
+        rospy.loginfo("Publsh turtle velocity command[%0.2f m/s, %0.2f rad/s]",vel_msg.linear.x, vel_msg.angular.z)
+
+		# 按照循环频率延时
+        rate.sleep()
+
+if __name__ == '__main__':
+    try:
+        velocity_publisher()
+    except rospy.ROSInterruptException:
         pass
+
+
