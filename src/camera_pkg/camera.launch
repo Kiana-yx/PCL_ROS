@@ -1,6 +1,6 @@
-<!-- <launch>
-    <!-- <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch"/> -->
+<launch>
+    <include file="/home/kiana/catkin_lib/src/realsense-ros/realsense2_camera/launch/rs_camera.launch"/>
 <!-- roslaunch realsense2_camera rs_camera.launch -->
-    <node pkg="camera_pkg" type="euclidean_cluster_node" name="euclidean_cluster_node" output="screen"/>
+    <node pkg="camera_pkg" type="face_follow.py" name="face_follow.py" output="screen"/>
     <node pkg="rviz" type="rviz" name="rviz" args="-d $(find camera_pkg)/rviz/img.rviz"/>
-</launch> -->
+</launch>
