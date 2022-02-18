@@ -1,0 +1,6 @@
+<launch>
+    <include file="/home/kiana/catkin_lib/src/realsense-ros/realsense2_camera/launch/rs_camera.launch"/>
+    <!-- roslaunch realsense2_camera rs_camera.launch -->
+    <node pkg="camera_pkg" type="ball_follow.py" name="ball_follow" output="screen"/>
+
+</launch>
