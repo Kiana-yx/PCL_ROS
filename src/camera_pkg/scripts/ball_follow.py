@@ -9,7 +9,7 @@ from sensor_msgs.msg import Image
 
 face_cascade = cv2.CascadeClassifier( '/home/kiana/catkin_ws/src/camera_pkg/scripts/face.xml' ) 
 
-def findBallByColor(msg):
+def findContoursByColor(msg):
     frame = bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
     
     # 在 HSV 颜色空间中要比在 BGR 空间中更容易表示一个特定颜
@@ -35,22 +35,33 @@ def findBallByColor(msg):
     contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)  # 查找轮廓
     # 下面的代码查找包围框，并绘制
     x, y, w, h = 0, 0, 0, 0
+    maxArea = 0
     for cnt in contours:
-        area_ball = cv2.contourArea(cnt)
         x, y, w, h = cv2.boundingRect(cnt)
         targetPos_x = int(x + w / 2)
         targetPos_y = int(y + h / 2)
         frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
         mask = cv2.rectangle(mask, (x, y), (x + w, y + h), (255, 0, 0), 2)
     
+    if contours != []:
+        for j in range(len(contours)):
+            area = cv2.contourArea(contours[j])
+            if area > maxArea:
+                maxArea = area
+                maxBlueIndex = j
+        if maxArea > 20:
+            maxContours = [contours[maxBlueIndex]]
+
     # 显示图像
     cv2.imshow('frame', frame)
     cv2.imshow('mask', mask)
     cv2.imshow('res', res)
     cv2.waitKey(1)
+    
+    return maxContours
 
 if __name__ == '__main__':
     rospy.init_node('ball_follow', anonymous=True)
     bridge = cv_bridge.CvBridge()
-    image_sub = rospy.Subscriber("/camera/color/image_raw", Image, findBallByColor)
+    image_sub = rospy.Subscriber("/camera/color/image_raw", Image, findContoursByColor)
     rospy.spin()
