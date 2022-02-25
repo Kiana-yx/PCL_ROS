@@ -32,7 +32,7 @@ void EuClusterCore::voxel_grid_filer(pcl::PointCloud<pcl::PointXYZ>::Ptr in, pcl
 }
 
 void EuClusterCore::cluster_segment(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc,
-                                    double in_max_cluster_distance, std::vector<Detected_Obj> &obj_list)
+                                    double in_max_cluster_distance, jsk_recognition_msgs::BoundingBoxArray &obj_list)
 {
 
     pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
@@ -59,84 +59,35 @@ void EuClusterCore::cluster_segment(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc,
     euclid.setSearchMethod(tree);
     euclid.extract(local_indices);
 
-    setlocale(LC_CTYPE, "zh_CN.utf8");
-    ROS_INFO("聚类为: %ld 块", local_indices.size());
-
     for (size_t i = 0; i < local_indices.size(); i++)
     {
         // the structure to save one detected object
-        Detected_Obj obj_info;
+        jsk_recognition_msgs::BoundingBox obj_info;
+        pcl::PointCloud<pcl::PointXYZ>::Ptr temp(new pcl::PointCloud<pcl::PointXYZ>);
 
-        float min_x = std::numeric_limits<float>::max();
-        float max_x = -std::numeric_limits<float>::max();
-        float min_y = std::numeric_limits<float>::max();
-        float max_y = -std::numeric_limits<float>::max();
-        float min_z = std::numeric_limits<float>::max();
-        float max_z = -std::numeric_limits<float>::max();
+        // point_cloud_header_= 
+        obj_info.header = point_cloud_header_;
 
-        for (auto pit = local_indices[i].indices.begin(); pit != local_indices[i].indices.end(); ++pit)
-        {
-            // fill new colored cluster point by point
-            pcl::PointXYZ p;
-            p.x = in_pc->points[*pit].x;
-            p.y = in_pc->points[*pit].y;
-            p.z = in_pc->points[*pit].z;
+        // 提取点云
+        pcl::copyPointCloud(*in_pc, local_indices[i], *temp);   //注意cloud2D没有高度信息，无法建立bounding box
+        pcl::PointXYZ minPt, maxPt;
+        pcl::getMinMax3D(*temp, minPt, maxPt);
 
-            obj_info.centroid_.x += p.x;
-            obj_info.centroid_.y += p.y;
-            obj_info.centroid_.z += p.z;
+        obj_info.pose.position.x = (maxPt.x + minPt.x) / 2;
+        obj_info.pose.position.y = (maxPt.y + minPt.y) / 2;
+        obj_info.pose.position.z = (maxPt.z + minPt.z) / 2;
 
-            if (p.x < min_x)
-                min_x = p.x;
-            if (p.y < min_y)
-                min_y = p.y;
-            if (p.z < min_z)
-                min_z = p.z;
-            if (p.x > max_x)
-                max_x = p.x;
-            if (p.y > max_y)
-                max_y = p.y;
-            if (p.z > max_z)
-                max_z = p.z;
-        }
+        obj_info.dimensions.x = maxPt.x - minPt.x;
+        obj_info.dimensions.y = maxPt.y - minPt.y;
+        obj_info.dimensions.z = maxPt.z - minPt.z;
 
-        // min, max points
-        obj_info.min_point_.x = min_x;
-        obj_info.min_point_.y = min_y;
-        obj_info.min_point_.z = min_z;
-
-        obj_info.max_point_.x = max_x;
-        obj_info.max_point_.y = max_y;
-        obj_info.max_point_.z = max_z;
-
-        // calculate centroid, average
-        if (local_indices[i].indices.size() > 0)
-        {
-            obj_info.centroid_.x /= local_indices[i].indices.size(); // Centroid是多边形的质量中心（Center of mass）
-            obj_info.centroid_.y /= local_indices[i].indices.size();
-            obj_info.centroid_.z /= local_indices[i].indices.size();
-        }
-
-        // calculate bounding box
-        double length_ = obj_info.max_point_.x - obj_info.min_point_.x;
-        double width_ = obj_info.max_point_.y - obj_info.min_point_.y;
-        double height_ = obj_info.max_point_.z - obj_info.min_point_.z;
-
-        obj_info.bounding_box_.header = point_cloud_header_;
-
-        obj_info.bounding_box_.pose.position.x = obj_info.min_point_.x + length_ / 2;
-        obj_info.bounding_box_.pose.position.y = obj_info.min_point_.y + width_ / 2;
-        obj_info.bounding_box_.pose.position.z = obj_info.min_point_.z + height_ / 2;
-
-        obj_info.bounding_box_.dimensions.x = ((length_ < 0) ? -1 * length_ : length_);
-        obj_info.bounding_box_.dimensions.y = ((width_ < 0) ? -1 * width_ : width_);
-        obj_info.bounding_box_.dimensions.z = ((height_ < 0) ? -1 * height_ : height_);
-
-        obj_list.push_back(obj_info);
+        if(obj_info.dimensions.z > 1.7 ||obj_info.dimensions.z < 1.5)
+            continue;
+        obj_list.boxes.push_back(obj_info);
     }
 }
 
-void EuClusterCore::cluster_by_distance(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc, std::vector<Detected_Obj> &obj_list)
+void EuClusterCore::cluster_by_distance(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc, jsk_recognition_msgs::BoundingBoxArray &obj_list)
 {
     // cluster the pointcloud according to the distance of the points using different thresholds (not only one for the entire pc)
     // in this way, the points farther in the pc will also be clustered
@@ -211,17 +162,10 @@ void EuClusterCore::point_cb(const sensor_msgs::PointCloud2ConstPtr &in_cloud_pt
     pcl::fromROSMsg(*in_cloud_ptr, *current_pc_ptr);
     // down sampling the point cloud before cluster
     // voxel_grid_filer(current_pc_ptr, filtered_pc_ptr, LEAF_SIZE);
-     filtered_pc_ptr = current_pc_ptr;
-    std::vector<Detected_Obj> global_obj_list;
-    cluster_by_distance(filtered_pc_ptr, global_obj_list);
+    filtered_pc_ptr = current_pc_ptr;
+    jsk_recognition_msgs::BoundingBoxArray BOXS;
+    cluster_by_distance(filtered_pc_ptr, BOXS);
 
-    jsk_recognition_msgs::BoundingBoxArray bbox_array;
-
-    for (size_t i = 0; i < global_obj_list.size(); i++)
-    {
-        bbox_array.boxes.push_back(global_obj_list[i].bounding_box_);
-    }
-    bbox_array.header = point_cloud_header_;
-
-    pub_bounding_boxs_.publish(bbox_array);
+    BOXS.header = point_cloud_header_;
+    pub_bounding_boxs_.publish(BOXS);
 }

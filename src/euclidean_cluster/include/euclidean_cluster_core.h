@@ -28,8 +28,8 @@
 #include <sensor_msgs/PointCloud2.h>
 
 #define LEAF_SIZE 0.1 //定义降采样的leaf size，聚类是一个费时运算，为了减少计算量，我们通常先进行降采样
-#define MIN_CLUSTER_SIZE 100
-#define MAX_CLUSTER_SIZE 500
+#define MIN_CLUSTER_SIZE 30
+#define MAX_CLUSTER_SIZE 1000
 
 class EuClusterCore
 {
@@ -53,10 +53,10 @@ private:
     std_msgs::Header point_cloud_header_;
     void voxel_grid_filer(pcl::PointCloud<pcl::PointXYZ>::Ptr in, pcl::PointCloud<pcl::PointXYZ>::Ptr out, double leaf_size);
 
-    void cluster_by_distance(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc, std::vector<Detected_Obj> &obj_list);
+    void cluster_by_distance(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc, jsk_recognition_msgs::BoundingBoxArray &obj_list);
 
     void cluster_segment(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc,
-                         double in_max_cluster_distance, std::vector<Detected_Obj> &obj_list);
+                         double in_max_cluster_distance, jsk_recognition_msgs::BoundingBoxArray &obj_list);
 
     void point_cb(const sensor_msgs::PointCloud2ConstPtr &in_cloud_ptr);
 
