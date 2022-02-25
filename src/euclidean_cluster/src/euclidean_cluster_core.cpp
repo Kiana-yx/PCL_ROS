@@ -2,9 +2,9 @@
 
 EuClusterCore::EuClusterCore(ros::NodeHandle &nh)
 {
-    seg_distance_ = {15, 30, 45, 60};   //划分区域
-    cluster_distance_ = {0.2, 1.0, 1.5, 2.0, 2.5};  //不同距离区域使用不同的聚类半径阈值
-    
+    seg_distance_ = {15, 30, 45, 60};              //划分区域
+    cluster_distance_ = {0.2, 1.0, 1.5, 2.0, 2.5}; //不同距离区域使用不同的聚类半径阈值
+
     sub_point_cloud_ = nh.subscribe("/filtered_points_no_ground", 5, &EuClusterCore::point_cb, this);
     pub_bounding_boxs_ = nh.advertise<jsk_recognition_msgs::BoundingBoxArray>("/detected_bounding_boxs", 5);
 
@@ -37,29 +37,29 @@ void EuClusterCore::cluster_segment(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc,
 
     pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
 
-    //create 2d pc
+    // create 2d pc
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_2d(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::copyPointCloud(*in_pc, *cloud_2d);
-    //make it flat
+    // make it flat
     for (size_t i = 0; i < cloud_2d->points.size(); i++)
     {
         cloud_2d->points[i].z = 0;
     }
 
-    // if (cloud_2d->points.size() > 0)
-    //     tree->setInputCloud(cloud_2d);
+    if (cloud_2d->points.size() > 0)
+        tree->setInputCloud(cloud_2d);
 
     //欧式距离分类
     pcl::EuclideanClusterExtraction<pcl::PointXYZ> euclid;
     std::vector<pcl::PointIndices> local_indices;
-    euclid.setInputCloud(in_pc);
-    euclid.setClusterTolerance(in_max_cluster_distance);//设置近邻搜索的搜索半径
-    euclid.setMinClusterSize(MIN_CLUSTER_SIZE);//设置最小聚类尺寸
+    euclid.setInputCloud(cloud_2d);
+    euclid.setClusterTolerance(in_max_cluster_distance); //设置近邻搜索的搜索半径
+    euclid.setMinClusterSize(MIN_CLUSTER_SIZE);          //设置最小聚类尺寸
     euclid.setMaxClusterSize(MAX_CLUSTER_SIZE);
     euclid.setSearchMethod(tree);
     euclid.extract(local_indices);
 
-    setlocale(LC_CTYPE, "zh_CN.utf8");  
+    setlocale(LC_CTYPE, "zh_CN.utf8");
     ROS_INFO("聚类为: %ld 块", local_indices.size());
 
     for (size_t i = 0; i < local_indices.size(); i++)
@@ -76,7 +76,7 @@ void EuClusterCore::cluster_segment(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc,
 
         for (auto pit = local_indices[i].indices.begin(); pit != local_indices[i].indices.end(); ++pit)
         {
-            //fill new colored cluster point by point
+            // fill new colored cluster point by point
             pcl::PointXYZ p;
             p.x = in_pc->points[*pit].x;
             p.y = in_pc->points[*pit].y;
@@ -100,7 +100,7 @@ void EuClusterCore::cluster_segment(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc,
                 max_z = p.z;
         }
 
-        //min, max points
+        // min, max points
         obj_info.min_point_.x = min_x;
         obj_info.min_point_.y = min_y;
         obj_info.min_point_.z = min_z;
@@ -109,15 +109,15 @@ void EuClusterCore::cluster_segment(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc,
         obj_info.max_point_.y = max_y;
         obj_info.max_point_.z = max_z;
 
-        //calculate centroid, average
+        // calculate centroid, average
         if (local_indices[i].indices.size() > 0)
         {
-            obj_info.centroid_.x /= local_indices[i].indices.size();
+            obj_info.centroid_.x /= local_indices[i].indices.size(); // Centroid是多边形的质量中心（Center of mass）
             obj_info.centroid_.y /= local_indices[i].indices.size();
             obj_info.centroid_.z /= local_indices[i].indices.size();
         }
 
-        //calculate bounding box
+        // calculate bounding box
         double length_ = obj_info.max_point_.x - obj_info.min_point_.x;
         double width_ = obj_info.max_point_.y - obj_info.min_point_.y;
         double height_ = obj_info.max_point_.z - obj_info.min_point_.z;
@@ -138,14 +138,14 @@ void EuClusterCore::cluster_segment(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc,
 
 void EuClusterCore::cluster_by_distance(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc, std::vector<Detected_Obj> &obj_list)
 {
-    //cluster the pointcloud according to the distance of the points using different thresholds (not only one for the entire pc)
-    //in this way, the points farther in the pc will also be clustered
+    // cluster the pointcloud according to the distance of the points using different thresholds (not only one for the entire pc)
+    // in this way, the points farther in the pc will also be clustered
 
-    //0 => 0-15m d=0.5
-    //1 => 15-30 d=1
-    //2 => 30-45 d=1.6
-    //3 => 45-60 d=2.1
-    //4 => >60   d=2.6
+    // 0 => 0-15m d=0.5
+    // 1 => 15-30 d=1
+    // 2 => 30-45 d=1.6
+    // 3 => 45-60 d=2.1
+    // 4 => >60   d=2.6
     //将点云根据距离划分为5组
     std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> segment_pc_array(5);
 
@@ -172,7 +172,7 @@ void EuClusterCore::cluster_by_distance(pcl::PointCloud<pcl::PointXYZ>::Ptr in_p
 
         if (origin_distance < seg_distance_[0])
         {
-            segment_pc_array[0]->points.push_back(current_point);   //push_back: 向数据结构中添加元素
+            segment_pc_array[0]->points.push_back(current_point); // push_back: 向数据结构中添加元素
         }
         else if (origin_distance < seg_distance_[1])
         {
@@ -206,12 +206,12 @@ void EuClusterCore::point_cb(const sensor_msgs::PointCloud2ConstPtr &in_cloud_pt
     pcl::PointCloud<pcl::PointXYZ>::Ptr current_pc_ptr(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_pc_ptr(new pcl::PointCloud<pcl::PointXYZ>);
 
-   point_cloud_header_ = in_cloud_ptr->header;
+    point_cloud_header_ = in_cloud_ptr->header;
 
     pcl::fromROSMsg(*in_cloud_ptr, *current_pc_ptr);
     // down sampling the point cloud before cluster
-    voxel_grid_filer(current_pc_ptr, filtered_pc_ptr, LEAF_SIZE);
-
+    // voxel_grid_filer(current_pc_ptr, filtered_pc_ptr, LEAF_SIZE);
+     filtered_pc_ptr = current_pc_ptr;
     std::vector<Detected_Obj> global_obj_list;
     cluster_by_distance(filtered_pc_ptr, global_obj_list);
 
@@ -221,7 +221,7 @@ void EuClusterCore::point_cb(const sensor_msgs::PointCloud2ConstPtr &in_cloud_pt
     {
         bbox_array.boxes.push_back(global_obj_list[i].bounding_box_);
     }
-   bbox_array.header = point_cloud_header_;
-   
+    bbox_array.header = point_cloud_header_;
+
     pub_bounding_boxs_.publish(bbox_array);
 }
