@@ -1,26 +1,29 @@
-#include <ros/ros.h>
-#include <sensor_msgs/PointCloud2.h>
+#include <message_filters/subscriber.h>
+#include <message_filters/time_synchronizer.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/CameraInfo.h>
 
-// 接收到订阅的消息后，会进入消息回调函数
-void personInfoCallback(const sensor_msgs::PointCloud2ConstPtr &in_cloud_ptr)
+using namespace sensor_msgs;
+using namespace message_filters;
+
+void callback(const ImageConstPtr& image_source1, const ImageConstPtr& image_source2)
 {
-    // 将接收到的消息打印出来
-    ROS_INFO("Subcribe Person Info");
+  setlocale(LC_CTYPE, "zh_CN.utf8");  
+  ROS_INFO("成功接受!");
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    // 初始化ROS节点
-    ros::init(argc, argv, "person_subscriber");
+  ros::init(argc, argv, "vision_node");
 
-    // 创建节点句柄
-    ros::NodeHandle n;
-    ROS_INFO("Subcribe Person Info------");
-    // 创建一个Subscriber，订阅名为/person_info的topic，注册回调函数personInfoCallback
-    ros::Subscriber point_sub = n.subscribe("/velodyne_points", 10, personInfoCallback);
+  ros::NodeHandle nh;
 
-    // 循环等待回调函数
-    ros::spin();
+  message_filters::Subscriber<Image> image_sub(nh, "/camera/color/image_raw", 1);
+  message_filters::Subscriber<Image> depth_sub(nh, "/camera/aligned_depth_to_color/image_raw", 1);
+  TimeSynchronizer<Image, Image> sync(image_sub, depth_sub, 10);
+  sync.registerCallback(boost::bind(&callback, _1, _2));
 
-    return 0;
+  ros::spin();
+
+  return 0;
 }
