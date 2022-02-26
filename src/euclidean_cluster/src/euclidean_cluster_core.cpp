@@ -59,6 +59,7 @@ void EuClusterCore::cluster_segment(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc,
     euclid.setSearchMethod(tree);
     euclid.extract(local_indices);
 
+    int id = 0;
     for (size_t i = 0; i < local_indices.size(); i++)
     {
         // the structure to save one detected object
@@ -83,6 +84,9 @@ void EuClusterCore::cluster_segment(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc,
 
         if(obj_info.dimensions.z > 1.7 ||obj_info.dimensions.z < 1.5)
             continue;
+
+        id++;
+        obj_info.label = id;
         obj_list.boxes.push_back(obj_info);
     }
 }
