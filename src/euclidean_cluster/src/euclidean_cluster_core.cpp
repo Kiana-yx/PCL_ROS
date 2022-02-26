@@ -66,23 +66,44 @@ void EuClusterCore::cluster_segment(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc,
         jsk_recognition_msgs::BoundingBox obj_info;
         pcl::PointCloud<pcl::PointXYZ>::Ptr temp(new pcl::PointCloud<pcl::PointXYZ>);
 
-        // point_cloud_header_= 
+        // point_cloud_header_=
         obj_info.header = point_cloud_header_;
 
         // 提取点云
-        pcl::copyPointCloud(*in_pc, local_indices[i], *temp);   //注意cloud2D没有高度信息，无法建立bounding box
+        pcl::copyPointCloud(*in_pc, local_indices[i], *temp); //注意cloud2D没有高度信息，无法建立bounding box
         pcl::PointXYZ minPt, maxPt;
         pcl::getMinMax3D(*temp, minPt, maxPt);
 
         obj_info.pose.position.x = (maxPt.x + minPt.x) / 2;
         obj_info.pose.position.y = (maxPt.y + minPt.y) / 2;
         obj_info.pose.position.z = (maxPt.z + minPt.z) / 2;
+        // TODO:orientation 四元素+点云配准
+
+        // tf2::Quaternion quaternion_tf2;
+        // quaternion_tf2.setRPY(0.7875, 0, 0);
+        // geometry_msgs::Quaternion quaternion = tf2::toMsg(quaternion_tf2);
+
+        float yaw = 0.52;
+        float pitch = 0.52;
+        float roll = 0.78;
+
+        double cy = cos(yaw * 0.5);
+        double sy = sin(yaw * 0.5);
+        double cp = cos(pitch * 0.5);
+        double sp = sin(pitch * 0.5);
+        double cr = cos(roll * 0.5);
+        double sr = sin(roll * 0.5);
+
+        obj_info.pose.orientation.w = cy * cp * cr + sy * sp * sr;
+        obj_info.pose.orientation.x = cy * cp * sr - sy * sp * cr;
+        obj_info.pose.orientation.y = sy * cp * sr + cy * sp * cr;
+        obj_info.pose.orientation.z = sy * cp * cr - cy * sp * sr;
 
         obj_info.dimensions.x = maxPt.x - minPt.x;
         obj_info.dimensions.y = maxPt.y - minPt.y;
         obj_info.dimensions.z = maxPt.z - minPt.z;
 
-        if(obj_info.dimensions.z > 1.7 ||obj_info.dimensions.z < 1.5)
+        if (obj_info.dimensions.z > 1.7 || obj_info.dimensions.z < 1.5)
             continue;
 
         id++;
