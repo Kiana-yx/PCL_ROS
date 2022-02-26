@@ -169,9 +169,9 @@ include_directories(
 #   PATTERN ".svn" EXCLUDE
 # )
 
-# add_executable(avoidance src/avoidance.cpp)
-# add_dependencies(avoidance ${${PROJECT_NAME}_EXPORTED_TARGETS})
-# target_link_libraries(avoidance ${catkin_LIBRARIES})
+add_executable(vision_node src/vision_node.cpp)
+# add_dependencies(vision_node ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(vision_node ${catkin_LIBRARIES})
 
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
