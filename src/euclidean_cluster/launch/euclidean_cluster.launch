@@ -1,0 +1,9 @@
+<launch>
+    <node pkg="rosbag" type="play" name="player" output="screen" args="--clock -l /home/kiana/record_bags/indoor.bag"/>
+    <rosparam file="$(find euclidean_cluster)/param.yaml" command="load"/>
+    <node pkg="pcl_test" type="pcl_test_node" name="pcl_test_node" output="screen" />
+    <node pkg="euclidean_cluster" type="euclidean_cluster_node" name="euclidean_cluster_node" output="screen"/>
+    <node pkg="using_markers" type="frame_box" name="frame_box" output="screen"/>
+      
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find euclidean_cluster)/rviz/base_1.rviz"/>
+</launch>
