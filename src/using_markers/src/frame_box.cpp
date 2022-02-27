@@ -25,12 +25,12 @@ public:
 
 void Frame::get_param(void)
 {
-    ros::param::get("/min_x", min_x);
-    ros::param::get("/min_y", min_y);
-    ros::param::get("/min_z", min_z);
-    ros::param::get("/max_x", max_x);
-    ros::param::get("/max_y", max_y);
-    ros::param::get("/max_z", max_z);
+    ros::param::get("/dynamic_reconfigure_node/min_x", min_x);
+    ros::param::get("/dynamic_reconfigure_node/min_y", min_y);
+    ros::param::get("/dynamic_reconfigure_node/min_z", min_z);
+    ros::param::get("/dynamic_reconfigure_node/max_x", max_x);
+    ros::param::get("/dynamic_reconfigure_node/max_y", max_y);
+    ros::param::get("/dynamic_reconfigure_node/max_z", max_z);
 }
 
 void Frame::get_point(void)
@@ -109,10 +109,11 @@ int main(int argc, char **argv)
 
     ros::Rate r(10); //设置循环频率为10hz
 
-    Frame safety_frame;
+    
 
     while (ros::ok())
     {
+        Frame safety_frame;
         safety_frame.get_param();
         safety_frame.get_point();
         safety_frame.marker_init();

@@ -43,6 +43,9 @@ void EuClusterCore::cluster_segment(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc,
     ros::param::get("/max_x", g_max_x);
     ros::param::get("/max_y", g_max_y);
     ros::param::get("/max_z", g_max_z);
+    // float temp1;
+    // ros::param::get("/dynamic_reconfigure_node/min_x", temp1);
+    // ROS_INFO("change? %f",temp1);
 
     pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
 

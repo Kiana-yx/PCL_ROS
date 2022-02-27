@@ -13,3 +13,4 @@ src/*
 !src/rviz_telop_commander/
 !src/learning_python/
 !src/using_markers/
+!src/dynamic_parameter/
