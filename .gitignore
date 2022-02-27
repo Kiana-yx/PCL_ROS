@@ -12,3 +12,4 @@ src/*
 !src/tim_pkg/
 !src/rviz_telop_commander/
 !src/learning_python/
+!src/using_markers/
