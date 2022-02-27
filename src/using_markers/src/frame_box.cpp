@@ -16,8 +16,11 @@ public:
     float max_y;
     float max_z;
     geometry_msgs::Point p[8];
+    visualization_msgs::Marker marker;
     void get_param(void);
     void get_point(void);
+    void marker_init(void);
+    void paint(void);
 };
 
 void Frame::get_param(void)
@@ -59,57 +62,63 @@ void Frame::get_point(void)
     p[7].z = max_z;
 }
 
+void Frame::marker_init(void)
+{
+    marker.header.frame_id = "velodyne";
+    marker.header.stamp = ros::Time::now();
+    marker.ns = "points_and_lines";
+    marker.action = visualization_msgs::Marker::ADD;
+    marker.pose.orientation.w = 1.0;
+    marker.id = 0;
+    marker.scale.x = 0.05;
+    marker.type = visualization_msgs::Marker::LINE_LIST;
+
+    // Line list is red
+    marker.color.g = 1.0;
+    marker.color.a = 1.0;
+}
+
+void Frame::paint(void)
+{
+    for (uint32_t i = 0; i < 4; ++i)
+    {
+        marker.points.push_back(p[i % 4]);
+        marker.points.push_back(p[(i + 1) % 4]);
+    }
+    marker.points.push_back(p[0]);
+    marker.points.push_back(p[4]);
+    for (uint32_t i = 4; i < 7; ++i)
+    {
+        marker.points.push_back(p[i]);
+        marker.points.push_back(p[i + 1]);
+    }
+    marker.points.push_back(p[7]);
+    marker.points.push_back(p[4]);
+    for (uint32_t i = 0; i < 4; ++i)
+    {
+        marker.points.push_back(p[i]);
+        marker.points.push_back(p[i + 4]);
+    }
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "points_and_lines");
     ros::NodeHandle n;
-    ros::Publisher marker_pub = n.advertise<visualization_msgs::Marker>("safety_frame", 10);
+    ros::Publisher safety_pub_ = n.advertise<visualization_msgs::Marker>("safety_frame", 10);
 
     ros::Rate r(10); //设置循环频率为10hz
 
-    Frame frame1;
+    Frame safety_frame;
 
     while (ros::ok())
     {
-        frame1.get_param();
-        frame1.get_point();
-
-        visualization_msgs::Marker line_list;
-        line_list.header.frame_id = "velodyne";
-        line_list.header.stamp = ros::Time::now();
-        line_list.ns = "points_and_lines";
-        line_list.action = visualization_msgs::Marker::ADD;
-        line_list.pose.orientation.w = 1.0;
-        line_list.id = 0;
-        line_list.scale.x = 0.05;
-        line_list.type = visualization_msgs::Marker::LINE_LIST;
-
-        // Line list is red
-        line_list.color.g = 1.0;
-        line_list.color.a = 1.0;
-
-        // Create the vertices for the points and lines
-        for (uint32_t i = 0; i < 4; ++i)
-        {
-            line_list.points.push_back(frame1.p[i % 4]);
-            line_list.points.push_back(frame1.p[(i + 1) % 4]);
-        }
-        line_list.points.push_back(frame1.p[0]);
-        line_list.points.push_back(frame1.p[4]);
-        for (uint32_t i = 4; i < 7; ++i)
-        {
-            line_list.points.push_back(frame1.p[i]);
-            line_list.points.push_back(frame1.p[i + 1]);
-        }
-        line_list.points.push_back(frame1.p[7]);
-        line_list.points.push_back(frame1.p[4]);
-        for (uint32_t i = 0; i < 4; ++i)
-        {
-            line_list.points.push_back(frame1.p[i]);
-            line_list.points.push_back(frame1.p[i + 4]);
-        }
-
-        marker_pub.publish(line_list);
+        safety_frame.get_param();
+        safety_frame.get_point();
+        safety_frame.marker_init();
+        safety_frame.paint();
+        
+        safety_pub_.publish(safety_frame.marker);
 
         r.sleep();
     }
