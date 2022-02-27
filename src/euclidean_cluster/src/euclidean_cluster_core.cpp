@@ -34,6 +34,15 @@ void EuClusterCore::voxel_grid_filer(pcl::PointCloud<pcl::PointXYZ>::Ptr in, pcl
 void EuClusterCore::cluster_segment(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc,
                                     double in_max_cluster_distance, jsk_recognition_msgs::BoundingBoxArray &obj_list)
 {
+    // 读取背景颜色参数
+    float g_min_x,g_min_y,g_min_z;
+    float g_max_x,g_max_y,g_max_z;
+	ros::param::get("/min_x", g_min_x);
+	ros::param::get("/min_y", g_min_y);
+    ros::param::get("/min_z", g_min_z);
+    ros::param::get("/max_x", g_max_x);
+    ros::param::get("/max_y", g_max_y);
+    ros::param::get("/max_z", g_max_z);
 
     pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
 
@@ -83,25 +92,27 @@ void EuClusterCore::cluster_segment(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc,
         // quaternion_tf2.setRPY(0.7875, 0, 0);
         // geometry_msgs::Quaternion quaternion = tf2::toMsg(quaternion_tf2);
 
-        float yaw = 0.52;
-        float pitch = 0.52;
-        float roll = 0.78;
+        // float yaw = 0.52;
+        // float pitch = 0.52;
+        // float roll = 0.78;
 
-        double cy = cos(yaw * 0.5);
-        double sy = sin(yaw * 0.5);
-        double cp = cos(pitch * 0.5);
-        double sp = sin(pitch * 0.5);
-        double cr = cos(roll * 0.5);
-        double sr = sin(roll * 0.5);
+        // double cy = cos(yaw * 0.5);
+        // double sy = sin(yaw * 0.5);
+        // double cp = cos(pitch * 0.5);
+        // double sp = sin(pitch * 0.5);
+        // double cr = cos(roll * 0.5);
+        // double sr = sin(roll * 0.5);
 
-        obj_info.pose.orientation.w = cy * cp * cr + sy * sp * sr;
-        obj_info.pose.orientation.x = cy * cp * sr - sy * sp * cr;
-        obj_info.pose.orientation.y = sy * cp * sr + cy * sp * cr;
-        obj_info.pose.orientation.z = sy * cp * cr - cy * sp * sr;
+        // obj_info.pose.orientation.w = cy * cp * cr + sy * sp * sr;
+        // obj_info.pose.orientation.x = cy * cp * sr - sy * sp * cr;
+        // obj_info.pose.orientation.y = sy * cp * sr + cy * sp * cr;
+        // obj_info.pose.orientation.z = sy * cp * cr - cy * sp * sr;
 
         obj_info.dimensions.x = maxPt.x - minPt.x;
         obj_info.dimensions.y = maxPt.y - minPt.y;
         obj_info.dimensions.z = maxPt.z - minPt.z;
+
+        ROS_INFO("Get Param[%f, %f, %f]", g_min_x, g_min_y, g_min_z);
 
         if (obj_info.dimensions.z > 1.7 || obj_info.dimensions.z < 1.5)
             continue;
