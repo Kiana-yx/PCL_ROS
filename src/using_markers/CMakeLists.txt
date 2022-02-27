@@ -145,10 +145,8 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-add_executable(basic_shapes src/basic_shapes.cpp)
-target_link_libraries(basic_shapes ${catkin_LIBRARIES})
-add_executable(points_and_lines src/points_and_lines.cpp)
-target_link_libraries(points_and_lines ${catkin_LIBRARIES})
+add_executable(frame_box src/frame_box.cpp)
+target_link_libraries(frame_box ${catkin_LIBRARIES})
 
 #############
 ## Install ##

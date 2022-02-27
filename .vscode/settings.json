@@ -87,6 +87,7 @@
         "stack": "cpp",
         "cstdbool": "cpp",
         "*.rh": "cpp",
-        "core": "cpp"
+        "core": "cpp",
+        "nonlinearoptimization": "cpp"
     }
 }
