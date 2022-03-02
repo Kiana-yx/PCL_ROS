@@ -36,6 +36,7 @@
 #define MIN_DISTANCE 0.5
 #define RADIAL_DIVIDER_ANGLE 0.199
 #define SENSOR_HEIGHT 0.75
+// 0.86
 #endif
 
 #define concentric_divider_distance_ 0.01 //0.1 meters default

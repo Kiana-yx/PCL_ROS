@@ -117,7 +117,7 @@ void EuClusterCore::cluster_segment(pcl::PointCloud<pcl::PointXYZ>::Ptr in_pc,
 
         // ROS_INFO("Get Param[%f, %f, %f]", g_min_x, g_min_y, g_min_z);
 
-        if (obj_info.dimensions.z > 1.7 || obj_info.dimensions.z < 1.5)
+        if (obj_info.dimensions.z < 1.4 || obj_info.dimensions.z > 1.7)
             continue;
 
         id++;
