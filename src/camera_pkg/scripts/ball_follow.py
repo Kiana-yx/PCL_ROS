@@ -43,6 +43,7 @@ def findContoursByColor(msg):
         frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
         mask = cv2.rectangle(mask, (x, y), (x + w, y + h), (255, 0, 0), 2)
     
+    maxContours = 0
     if contours != []:
         for j in range(len(contours)):
             area = cv2.contourArea(contours[j])
