@@ -15,7 +15,9 @@
                 "${workspaceFolder}/src/euclidean_cluster/include",
                 "${workspaceFolder}/src/tim_pkg/include",
                 "${workspaceFolder}/src/rviz_telop_commander/include",
-                "${workspaceFolder}/devel/include"
+                "${workspaceFolder}/devel/include",
+                "${workspaceFolder}/src/map_pkg/include",
+                "/opt/ros/noetic/include"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",
