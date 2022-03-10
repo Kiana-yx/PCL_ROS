@@ -17,7 +17,8 @@
                 "${workspaceFolder}/src/rviz_telop_commander/include",
                 "${workspaceFolder}/devel/include",
                 "${workspaceFolder}/src/map_pkg/include",
-                "/opt/ros/noetic/include"
+                "/opt/ros/noetic/include",
+                "${workspaceFolder}/src/occupany_mapping/include/occupany_mapping"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",

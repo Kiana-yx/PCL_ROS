@@ -86,6 +86,7 @@ int GridCore::GridIndexToLinearIndex(GridIndex index)
 {
     int linear_index;
     linear_index = index.y * mapParams.width + index.x;
+    return linear_index;
 }
 
 // 2D画线算法　来进行计算两个点之间的grid cell
@@ -308,7 +309,7 @@ void GridCore::grid_main(const sensor_msgs::PointCloud2ConstPtr &in_cloud_ptr)
     filter.filter(*current_3D_ptr);
 
     Point_2D(current_3D_ptr, point_2D_ptr);
-    // publish_cloud(pub_2d_, point_2D_ptr, in_cloud_ptr->header);
+    publish_cloud(pub_2d_, point_2D_ptr, in_cloud_ptr->header);
     // grid_create(point_2D_ptr);
 
     //占用栅格地图构建算法
@@ -316,6 +317,4 @@ void GridCore::grid_main(const sensor_msgs::PointCloud2ConstPtr &in_cloud_ptr)
     //发布map，可视化
     PublishMap(pub_grid_);
     
-    if(pMap != NULL)
-    delete pMap;
 }
