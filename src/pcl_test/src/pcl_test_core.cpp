@@ -399,11 +399,11 @@ void PclTestCore::point_cb(const sensor_msgs::PointCloud2ConstPtr &in_cloud_ptr)
 
     clip_above(CLIP_HEIGHT, current_pc_ptr, cliped_pc_ptr, true);
     remove_close_pt(MIN_DISTANCE, cliped_pc_ptr, remove_close_ptr);
-    remove_outlier(remove_close_ptr, base_filtered_ptr);
+    // remove_outlier(remove_close_ptr, base_filtered_ptr);
     
     // remove_ground_RANSAC(base_filtered_ptr, no_ground_cloud_ptr, ground_cloud_ptr, true); //是否采用简化的平面滤波方式，简化后大致频率6.92Hz--6.88Hz
     // remove_ground_designated(base_filtered_ptr, no_ground_cloud_ptr, ground_cloud_ptr);//failure
-    remove_ground_Ray(base_filtered_ptr, no_ground_cloud_ptr, ground_cloud_ptr);   
+    remove_ground_Ray(remove_close_ptr, no_ground_cloud_ptr, ground_cloud_ptr);   
 
     publish_cloud(pub_no_ground_, no_ground_cloud_ptr, in_cloud_ptr->header);
     publish_cloud(pub_ground_, ground_cloud_ptr, in_cloud_ptr->header);
@@ -412,6 +412,6 @@ void PclTestCore::point_cb(const sensor_msgs::PointCloud2ConstPtr &in_cloud_ptr)
     std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
     std::chrono::duration<double> time_used = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time);
     setlocale(LC_CTYPE, "zh_CN.utf8");  
-    // ROS_INFO("处理一次数据用时: %f 秒", time_used.count());
+    ROS_INFO("处理一次数据用时: %f 秒", time_used.count());
 
 }
