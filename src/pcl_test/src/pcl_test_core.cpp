@@ -399,15 +399,15 @@ void PclTestCore::point_cb(const sensor_msgs::PointCloud2ConstPtr &in_cloud_ptr)
 
     clip_above(CLIP_HEIGHT, current_pc_ptr, cliped_pc_ptr, true);
     remove_close_pt(MIN_DISTANCE, cliped_pc_ptr, remove_close_ptr);
-    // remove_outlier(remove_close_ptr, base_filtered_ptr);
+    remove_outlier(remove_close_ptr, base_filtered_ptr); //NOTICE:速度太慢，暂时放弃
     
     // remove_ground_RANSAC(base_filtered_ptr, no_ground_cloud_ptr, ground_cloud_ptr, true); //是否采用简化的平面滤波方式，简化后大致频率6.92Hz--6.88Hz
     // remove_ground_designated(base_filtered_ptr, no_ground_cloud_ptr, ground_cloud_ptr);//failure
-    remove_ground_Ray(remove_close_ptr, no_ground_cloud_ptr, ground_cloud_ptr);   
+    remove_ground_Ray(base_filtered_ptr, no_ground_cloud_ptr, ground_cloud_ptr);   
 
     publish_cloud(pub_no_ground_, no_ground_cloud_ptr, in_cloud_ptr->header);
     publish_cloud(pub_ground_, ground_cloud_ptr, in_cloud_ptr->header);
-    publish_cloud(pub_filtered_, base_filtered_ptr, in_cloud_ptr->header);
+    publish_cloud(pub_filtered_, remove_close_ptr, in_cloud_ptr->header);
 
     std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
     std::chrono::duration<double> time_used = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time);
