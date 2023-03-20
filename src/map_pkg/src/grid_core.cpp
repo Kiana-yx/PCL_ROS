@@ -291,7 +291,7 @@ void GridCore::grid_create(const pcl::PointCloud<pcl::PointXYZ>::Ptr in)
     myMap.data = a;
 
     // frame id
-    myMap.header.frame_id = "velodyne";
+    myMap.header.frame_id = "map";
     // 广播
     pub_grid_.publish(myMap);
 }
@@ -310,11 +310,11 @@ void GridCore::grid_main(const sensor_msgs::PointCloud2ConstPtr &in_cloud_ptr)
 
     Point_2D(current_3D_ptr, point_2D_ptr);
     publish_cloud(pub_2d_, point_2D_ptr, in_cloud_ptr->header);
-    // grid_create(point_2D_ptr);
+    grid_create(point_2D_ptr);
 
-    //占用栅格地图构建算法
-    OccupanyMapping(point_2D_ptr);
-    //发布map，可视化
-    PublishMap(pub_grid_);
+    // //占用栅格地图构建算法
+    // OccupanyMapping(point_2D_ptr);
+    // //发布map，可视化
+    // PublishMap(pub_grid_);
     
 }
