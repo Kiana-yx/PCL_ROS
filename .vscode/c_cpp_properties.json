@@ -20,7 +20,8 @@
                 "/opt/ros/noetic/include",
                 "${workspaceFolder}/src/occupany_mapping/include/occupany_mapping",
                 "/usr/include/pcl-1.10",
-                "/usr/include/eigen3"
+                "/usr/include/eigen3",
+                "${workspaceFolder}/src/camera/include"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",
